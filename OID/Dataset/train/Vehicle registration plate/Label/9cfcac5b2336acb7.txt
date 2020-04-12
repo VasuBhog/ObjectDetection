@@ -1,0 +1,2 @@
+Vehicle registration plate 0.0 713.600256 136.96 761.600256
+Vehicle registration plate 302.08 550.400256 323.2 565.119744
