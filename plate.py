@@ -155,45 +155,45 @@ def train_test(train_df):
 
 
 
-# #plot bounding box
-# def plot_box(file_img,train_df):
-#     #train_df = pd.DataFrame(columns=['FilePath','Filename','XMin', 'XMax', 'YMin', 'YMax', 'ClassName'])
-#     gray_image = cv2.imread(file_img, cv2.IMREAD_COLOR)
-#     image = cv2.cvtColor(gray_image,cv2.COLOR_BGR2RGB)
-#     height, width, channel = image.shape
-#     print(f"Image: {image.shape}")
-#     cv2.resize(image,(128,128))
-#     for index in range(len(train_df["X"][0])):
-#         xmin = int(float(train_df['XMin'][0][index]))
-#         xmax = int(float(train_df['XMax'][0][index]))
-#         ymin = int(float(train_df['YMin'][0][index]))
-#         ymax = int(float(train_df['YMax'][0][index]))
+#plot bounding box
+def plot_box(file_img,train_df):
+    #train_df = pd.DataFrame(columns=['FilePath','Filename','XMin', 'XMax', 'YMin', 'YMax', 'ClassName'])
+    gray_image = cv2.imread(file_img, cv2.IMREAD_COLOR)
+    image = cv2.cvtColor(gray_image,cv2.COLOR_BGR2RGB)
+    height, width, channel = image.shape
+    print(f"Image: {image.shape}")
+    cv2.resize(image,(128,128))
+    for index in range(len(train_df["X"][0])):
+        xmin = int(float(train_df['XMin'][0][index]))
+        xmax = int(float(train_df['XMax'][0][index]))
+        ymin = int(float(train_df['YMin'][0][index]))
+        ymax = int(float(train_df['YMax'][0][index]))
 
-#         x = float(train_df['X'][0][index])
-#         y = float(train_df['Y'][0][index])
-#         bb_width = float(train_df['Width'][0][index])
-#         bb_height = float(train_df['Height'][0][index])
-#         class_name = train_df['ClassName'][0]
+        x = float(train_df['X'][0][index])
+        y = float(train_df['Y'][0][index])
+        bb_width = float(train_df['Width'][0][index])
+        bb_height = float(train_df['Height'][0][index])
+        class_name = train_df['ClassName'][0]
         
-#         print(x,y,bb_width,bb_height)
-#         x1 = int(x * height)
-#         y1 = int(y * width)
-#         x2 = int(x) + int(bb_width * height)
-#         y2 = int(y + int(bb_height * width)
+        print(x,y,bb_width,bb_height)
+        x1 = int(x * width) # row[3] = xmin
+        y1 = int(y * height) # row[5] = ymax
+        x2 = int(x1 + bb_width * width) # row[4] = xmax
+        y2 = int(y1 + bb_height * height) # row[6] = ymin
         
 
 
-#         print(f"Coordinates: {xmin,ymin}, {xmax,ymax}")
-#         print(f"Coordinates: {x1,y1}, {x2,y2}")
+        print(f"Coordinates: {xmin,ymin}, {xmax,ymax}")
+        print(f"Coordinates: {x1,y2}, {x2,y1}")
 
-#         cv2.rectangle(image, (x,y), (x2,y2), (0,0,255),1)
-#         cv2.rectangle(image, (xmax,ymax), (xmin,ymin), (255,0,0),1)
-#         font = cv2.FONT_HERSHEY_SIMPLEX
-#         cv2.putText(image, "Plate", (xmin,ymax-5), font, 1, (0,0,0), 2)
-#     plt.title((train_df['Filename'][0]) + ".jpg")
-#     plt.imshow(image)
-#     plt.axis("off")
-#     plt.show()
+        cv2.rectangle(image, (x1,y2), (x2,y1), (0,0,255), 1)
+        cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (255,0,0), 1)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(image, "Plate", (xmin,ymax-5), font, 1, (0,0,0), 2)
+    plt.title((train_df['Filename'][0]) + ".jpg")
+    plt.imshow(image)
+    plt.axis("off")
+    plt.show()
 
 
 def main():
