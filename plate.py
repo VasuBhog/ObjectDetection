@@ -39,7 +39,7 @@ def setup():
     plate_bbox = annotations_bbox[annotations_bbox['LabelName']==label_plate]
     return plate_bbox
 
-
+#Get the plates images to store in pandas
 def get_plates(plate_bbox):
     # #Amount of images in dataset
     # plate_img_id = plate_bbox['ImageID']
@@ -124,6 +124,7 @@ def get_plates(plate_bbox):
     # 0 0.716797 0.395833 0.216406 0.147222
     # 0 0.687109 0.379167 0.255469 0.158333
 
+#New Normalized Labels
 def new_labels(train_df):
     file_name = train_df['Filename']
     for i in range(len(file_name)):
@@ -136,27 +137,26 @@ def new_labels(train_df):
                             + train_df['Height'][i][j] + "\n"
                 text_file.write(line)
 
+#Train and Test File
 def train_test(train_df):
-    file_path = train_df['FilePath']
-
+    #C:\Users\bhogv\ObjectDetection\OID\Dataset\train\Vehicle registration plate\0a0a00b2fbe89a47.jpg
+    file_name = train_df['Filename']
+    # Create and/or truncate train.txt and test.txt
     with open('test.txt', 'w') as test:
         pass
     with open('train.txt', 'w') as train:
         pass
 
-    # Create and/or truncate train.txt and test.txt
     for i in range(len(train_df)):
+        file_path = "C:/Users/bhogv/ObjectDetection/OID/Dataset/train/Vehicle registration plate/" + file_name[i] + ".jpg"
         if i < 20:
             # save to test
             with open('test.txt', 'a') as test:
-                test.write(file_path[i] + "\n")
+                test.write(file_path + "\n")
         else:
             # save to train
             with open('train.txt', 'a') as train:
-                train.write(file_path[i] + "\n")
-
-
-
+                train.write(file_path + "\n")
 
 #plot bounding box
 def plot_box(file_img,train_df):
@@ -204,8 +204,8 @@ def main():
     plate_bbox = setup()
     train_df = get_plates(plate_bbox)
     # print(train_df)
-    # new_labels(train_df)
-    # train_test(train_df)
+    #new_labels(train_df)
+    train_test(train_df)
 
     # #Get one image from train_df
     file_img = train_df['FilePath'][0] 
