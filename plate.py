@@ -19,7 +19,7 @@ train_df = pd.DataFrame(columns=['FilePath','Filename','XMin', 'XMax', 'YMin', '
 
 #Gets the annotations and images for the specific dataset
 def setup():
-    base_path = 'OID\csv_folder'
+    base_path = 'OID/csv_folder'
     annotations_bbox_fname = 'train-annotations-bbox.csv'
     class_descriptions_fname = 'class-descriptions-boxable.csv'
     
@@ -28,7 +28,8 @@ def setup():
     # print(annotations_bbox.head())
 
     #Specific class label
-    class_descriptions = pd.read_csv(os.path.join(base_path, class_descriptions_fname))
+    class_descriptions = pd.read_csv(os.path.join(base_path, class_descriptions_fname),header=None)
+    class_descriptions.columns = ["name","class"]
     # print(class_descriptions.head())
     
     #Get the Plate images
@@ -55,7 +56,7 @@ def get_plates(plate_bbox):
         train_plate.append(f)
 
     #gets the unique images
-    rand_plates = list(set(train_plate).intersection(plate_img_id))
+    rand_plates = list(train_plate).intersection(plate_img_id)
 
     global train_df
 
@@ -66,7 +67,7 @@ def get_plates(plate_bbox):
     for x in temp_train:
         train_path = path + x
         isFile = os.path.isfile(train_path)
-        #checks to see if patht exists
+        #checks to see if path exists
         if(isFile):
             train_df = train_df.append({'FilePath': train_path,'Filename': x[1:-4],'ClassName':"0"},ignore_index=True)
 
