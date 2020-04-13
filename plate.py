@@ -18,6 +18,7 @@ path = "OID/Dataset/train/Vehicle registration plate"
 train_df = pd.DataFrame(columns=['FilePath','Filename','XMin', 'XMax', 'YMin', 'YMax', 'ClassName','X','Y','Width','Height'])
 
 #Gets the annotations and images for the specific dataset
+#Not needed if you already downloaded images
 def setup():
     base_path = 'OID/csv_folder'
     annotations_bbox_fname = 'train-annotations-bbox.csv'
@@ -41,12 +42,12 @@ def setup():
 
 
 def get_plates(plate_bbox):
-    #Amount of images in dataset
-    plate_img_id = plate_bbox['ImageID']
+    # #Amount of images in dataset
+    # plate_img_id = plate_bbox['ImageID']
 
-    #Amount of unique images
-    plate_img_id = np.unique(plate_img_id)
-    print('There are %d plates in the dataset' %(len(plate_img_id)))
+    # #Amount of unique images
+    # plate_img_id = np.unique(plate_img_id)
+    # print('There are %d plates in the dataset' %(len(plate_img_id)))
 
     #Find unique images
     files = os.listdir(path)
@@ -56,7 +57,9 @@ def get_plates(plate_bbox):
         train_plate.append(f)
 
     #gets the unique images
-    rand_plates = list(train_plate).intersection(plate_img_id)
+    rand_plates = list(set(train_plate))
+    
+    print('There are %d plates in the dataset' %(len(rand_plates)))
 
     global train_df
 
@@ -183,7 +186,7 @@ def plot_box(file_img,train_df):
         y2 = int(y1 + bb_height * height) # row[6] = ymin
         
 
-
+        #Check Origianl Coords and Normalized cords
         print(f"Coordinates: {xmin,ymin}, {xmax,ymax}")
         print(f"Coordinates: {x1,y2}, {x2,y1}")
 
