@@ -1,3 +1,4 @@
+# %%
 import numpy as np
 import time
 import sys
@@ -14,11 +15,13 @@ import cv2
 import csv
 
 #Global paths / variables
-path = "OID/Dataset/train/Vehicle registration plate"
+path = "OID/Dataset/train/Vehicle registration plate/"
 train_df = pd.DataFrame(columns=['FilePath','Filename','XMin', 'XMax', 'YMin', 'YMax', 'ClassName','X','Y','Width','Height'])
 
 #Gets the annotations and images for the specific dataset
 #Not needed if you already downloaded images
+
+# %%
 def setup():
     base_path = 'OID/csv_folder'
     annotations_bbox_fname = 'train-annotations-bbox.csv'
@@ -40,8 +43,10 @@ def setup():
     plate_bbox = annotations_bbox[annotations_bbox['LabelName']==label_plate]
     return plate_bbox
 
+# %%
 #Get the plates images to store in pandas
 def get_plates(plate_bbox):
+    
     # #Amount of images in dataset
     # plate_img_id = plate_bbox['ImageID']
 
@@ -90,10 +95,10 @@ def get_plates(plate_bbox):
                 temp_ymin = [] #bottom y
                 temp_x = []; temp_y = []; temp_width = []; temp_height = []
                 for row in csv_reader:
-                    absolute_x = float(row[3])
-                    absolute_y = float(row[4])
                     absolute_width = abs(float(row[3]) - float(row[5]))
                     absolute_height = abs(float(row[4]) - float(row[6]))
+                    absolute_x = float(row[3]) + absolute_width/2 
+                    absolute_y = float(row[4]) + absolute_height/2
 
                     x = absolute_x / image_width
                     y = absolute_y / image_height
@@ -101,9 +106,9 @@ def get_plates(plate_bbox):
                     height = absolute_height / image_height
                     
                     temp_xmin.append(row[3]) #left x
-                    temp_ymax.append(row[4]) #top Y
+                    temp_ymin.append(row[4]) #top Y
                     temp_xmax.append(row[5]) #right x
-                    temp_ymin.append(row[6]) #bottom y
+                    temp_ymax.append(row[6]) #bottom y
 
                     temp_x.append(str(x))
                     temp_y.append(str(y))
@@ -125,6 +130,7 @@ def get_plates(plate_bbox):
     # 0 0.716797 0.395833 0.216406 0.147222
     # 0 0.687109 0.379167 0.255469 0.158333
 
+# %%
 #New Normalized Labels
 def new_labels(train_df):
     file_name = train_df['Filename']
@@ -138,6 +144,7 @@ def new_labels(train_df):
                             + train_df['Height'][i][j] + "\n"
                 text_file.write(line)
 
+# %%
 #Train and Test File
 def train_test(train_df):
     #C:\Users\bhogv\ObjectDetection\OID\Dataset\train\Vehicle registration plate\0a0a00b2fbe89a47.jpg
@@ -149,8 +156,8 @@ def train_test(train_df):
         pass
 
     for i in range(len(train_df)):
-        file_path = "C:/Users/bhogv/ObjectDetection/OID/Dataset/train/Vehicle registration plate/" + file_name[i] + ".jpg"
-        if i < 20:
+        file_path = "C:/Users/bhogv/ObjectDetection/OID/Dataset/train/Vehicle_registration_plate/" + file_name[i] + ".jpg"
+        if i < 100:
             # save to test
             with open('test.txt', 'a') as test:
                 test.write(file_path + "\n")
@@ -159,6 +166,7 @@ def train_test(train_df):
             with open('train.txt', 'a') as train:
                 train.write(file_path + "\n")
 
+# %%
 #plot bounding box
 def plot_box(file_img,train_df):
     #train_df = pd.DataFrame(columns=['FilePath','Filename','XMin', 'XMax', 'YMin', 'YMax', 'ClassName'])
@@ -173,44 +181,52 @@ def plot_box(file_img,train_df):
         ymin = int(float(train_df['YMin'][0][index]))
         ymax = int(float(train_df['YMax'][0][index]))
 
-        x = float(train_df['X'][0][index])
-        y = float(train_df['Y'][0][index])
-        bb_width = float(train_df['Width'][0][index])
-        bb_height = float(train_df['Height'][0][index])
+        nor_x = float(train_df['X'][0][index])
+        nor_y = float(train_df['Y'][0][index])
+        nor_width = float(train_df['Width'][0][index])
+        nor_height = float(train_df['Height'][0][index])
         class_name = train_df['ClassName'][0]
         
-        print(x,y,bb_width,bb_height)
-        x1 = int(x * width) # row[3] = xmin
-        y1 = int(y * height) # row[5] = ymax
-        x2 = int(x1 + bb_width * width) # row[4] = xmax
-        y2 = int(y1 + bb_height * height) # row[6] = ymin
+        print(nor_x,nor_y,nor_width,nor_height)
         
+        abs_x = nor_x * width
+        abs_y = nor_y * height
+        abs_width = nor_width * width
+        abs_height = nor_height * height
 
-        #Check Origianl Coords and Normalized cords
-        print(f"Coordinates: {xmin,ymin}, {xmax,ymax}")
+        x1 = int(abs_x - abs_width/2) # row[3] = xmin
+        y1 = int(abs_height + y1) # row[4] = ymin
+        y2 = int(abs_y - abs_height/2) # row[5] = ymax
+        x2 = int(abs_width + x1) # row[6] = xmax
+
+        # print(f"Coordinates: {xmin,ymin}, {xmax,ymax}")
         print(f"Coordinates: {x1,y2}, {x2,y1}")
 
         cv2.rectangle(image, (x1,y2), (x2,y1), (0,0,255), 1)
-        cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (255,0,0), 1)
+        # cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (255,0,0), 1)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(image, "Plate", (xmin,ymax-5), font, 1, (0,0,0), 2)
+        cv2.putText(image, "Plate", (x1,y1-5), font, 1, (0,0,0), 2)
     plt.title((train_df['Filename'][0]) + ".jpg")
     plt.imshow(image)
     plt.axis("off")
     plt.show()
 
 
+# %%
 def main():
     #gets all files for Vehicle Registration Plate
     plate_bbox = setup()
     train_df = get_plates(plate_bbox)
     # print(train_df)
-    #new_labels(train_df)
+    new_labels(train_df)
     train_test(train_df)
 
     # #Get one image from train_df
-    file_img = train_df['FilePath'][0] 
-    plot_box(file_img,train_df)
+    # file_img = train_df['FilePath'][0] 
+    # plot_box(file_img,train_df)
 
 if __name__ == "__main__":
     main()
+
+
+# %%
