@@ -156,7 +156,7 @@ def train_test(train_df):
         pass
 
     for i in range(len(train_df)):
-        file_path = "C:/Users/bhogv/ObjectDetection/OID/Dataset/train/Vehicle_registration_plate/" + file_name[i] + ".jpg"
+        file_path = "C:/Users/bhogv/ObjectDetection/OID/Dataset/train/Vehicle registration plate/" + file_name[i] + ".jpg"
         if i < 100:
             # save to test
             with open('test.txt', 'a') as test:
@@ -176,33 +176,34 @@ def plot_box(file_img,train_df):
     print(f"Image: {image.shape}")
     cv2.resize(image,(128,128))
     for index in range(len(train_df["X"][0])):
-        xmin = int(float(train_df['XMin'][0][index]))
-        xmax = int(float(train_df['XMax'][0][index]))
-        ymin = int(float(train_df['YMin'][0][index]))
-        ymax = int(float(train_df['YMax'][0][index]))
+        # xmin = int(float(train_df['XMin'][0][index]))
+        # xmax = int(float(train_df['XMax'][0][index]))
+        # ymin = int(float(train_df['YMin'][0][index]))
+        # ymax = int(float(train_df['YMax'][0][index]))
 
         nor_x = float(train_df['X'][0][index])
         nor_y = float(train_df['Y'][0][index])
         nor_width = float(train_df['Width'][0][index])
         nor_height = float(train_df['Height'][0][index])
         class_name = train_df['ClassName'][0]
-        
+
         print(nor_x,nor_y,nor_width,nor_height)
-        
+
         abs_x = nor_x * width
         abs_y = nor_y * height
         abs_width = nor_width * width
         abs_height = nor_height * height
 
         x1 = int(abs_x - abs_width/2) # row[3] = xmin
-        y1 = int(abs_height + y1) # row[4] = ymin
-        y2 = int(abs_y - abs_height/2) # row[5] = ymax
-        x2 = int(abs_width + x1) # row[6] = xmax
+        y1 = int(abs_y - abs_height/2) # row[4] = ymax
+        x2 = int(abs_width + x1) # row[5] = xmax
+        y2 = int(abs_height + y1) # row[6] = ymin
 
         # print(f"Coordinates: {xmin,ymin}, {xmax,ymax}")
         print(f"Coordinates: {x1,y2}, {x2,y1}")
 
         cv2.rectangle(image, (x1,y2), (x2,y1), (0,0,255), 1)
+        # cv2.rectangle(image, (int(abs_x),int(abs_y)), (x2,y1), (0,0,255), 1)
         # cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (255,0,0), 1)
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(image, "Plate", (x1,y1-5), font, 1, (0,0,0), 2)
@@ -210,7 +211,6 @@ def plot_box(file_img,train_df):
     plt.imshow(image)
     plt.axis("off")
     plt.show()
-
 
 # %%
 def main():
